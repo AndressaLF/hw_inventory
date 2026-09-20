@@ -1,0 +1,26 @@
+# =============================================================================
+# Publicacao no GitHub: apenas artefatos de uso (executavel + manual).
+# Todo o restante do projeto fica fora do versionamento publico.
+# =============================================================================
+
+# Ignora tudo na raiz
+/*
+
+# Mantem apenas estes arquivos na raiz
+!.gitignore
+!README.md
+
+# Mantem a pasta dist, mas so com o que o usuario final precisa
+!dist/
+dist/*
+
+!dist/hw-inventory.exe
+!dist/MANUAL_UTILIZACAO.md
+!dist/MANUAL_UTILIZACAO.pdf
+!dist/manual_imagens/
+dist/manual_imagens/*
+
+!dist/manual_imagens/*.png
+!dist/manual_imagens/*.jpg
+!dist/manual_imagens/*.jpeg
+!dist/manual_imagens/*.webp
