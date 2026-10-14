@@ -26,17 +26,18 @@ Apoiar o **controle patrimonial** de equipamentos de laboratório:
 
 | Ambiente | Neste pacote | Condição |
 |----------|--------------|----------|
-| **Windows 10 / 11** (64 bits) | **Sim** — use `hw-inventory.exe` | Conta **Administrador** |
-| **Linux** | Sim, com versão própria para Linux | Executar com **sudo** |
-| **macOS** | Sim, com versão própria para macOS | Executar com **sudo** |
+| **Windows 10 / 11** (64 bits) | **Sim** — `dist/hw-inventory.exe` já pronto | Conta **Administrador** |
+| **Linux** | **Sim** — código em `hw_inventory/`; o binário ainda precisa ser gerado | **sudo** |
+| **macOS** | Não há versão neste repositório | — |
 
 **Atenção:**
 
-- O **`hw-inventory.exe` publicado aqui é somente para Windows**.  
-- Em Linux ou macOS, o `.exe` do Windows **não** funciona — é necessária a versão daquele sistema.  
-- Em qualquer ambiente: sem permissão de administrador, o programa **não inicia**.  
-- Uso previsto hoje: **um computador por vez**, **offline** (sem nuvem e sem varredura automática da rede).  
-- **Active Directory (nível B):** na abertura dá para escolher **Individual** ou **AD**. O modo AD só libera com domínio + grupo Administrador; o Individual continua igual e offline. Coleta sempre local neste PC.
+- `dist/hw-inventory.exe` é só Windows. No Linux ele não abre.
+- O binário Linux, quando gerado, se chama `dist/hw-inventory` (sem `.exe`). No Windows esse arquivo não abre.
+- Não existe um único arquivo que os dois sistemas executem. Cada um precisa do programa feito naquele sistema. A escolha automática é feita por um atalho de cada lado, descrito em [`docs/DEPENDENCIAS_SO.md`](docs/DEPENDENCIAS_SO.md).
+- Sem permissão de administrador, o programa não inicia.
+- Uso previsto: **um computador por vez**, offline, sem varredura de rede.
+- **Active Directory:** na abertura dá para escolher **Individual** ou **AD**. O modo AD só libera com domínio e grupo Administrador. A coleta continua só neste PC.
 
 Detalhes por sistema estão no manual: [`dist/MANUAL_UTILIZACAO.pdf`](dist/MANUAL_UTILIZACAO.pdf).
 
@@ -44,16 +45,17 @@ Detalhes por sistema estão no manual: [`dist/MANUAL_UTILIZACAO.pdf`](dist/MANUA
 
 ## O que este repositório contém
 
-Para proteção do conteúdo interno do projeto, este repositório público disponibiliza **apenas**:
-
 | Item | Descrição |
 |------|-----------|
-| `dist/hw-inventory.exe` | Programa pronto para usar no Windows |
+| `dist/hw-inventory.exe` | Programa pronto para usar no Windows. Não é recompilado por este código |
+| `dist/hw-inventory` | Binário Linux gerado por `scripts/build_linux.sh`. A janela ainda não foi testada |
+| `hw_inventory/` | Programa Linux (modo local, um computador por vez) |
+| `docs/DEPENDENCIAS_SO.md` | Checklist Linux e o que falta para os dois executáveis |
 | `dist/MANUAL_UTILIZACAO.pdf` | Manual ilustrado para novos usuários |
 | `dist/MANUAL_UTILIZACAO.md` | Mesmo manual em texto |
 | `dist/manual_imagens/` | Figuras usadas no manual |
 
-Não há publicação do conteúdo interno de desenvolvimento neste repositório.
+O código publicado aqui é a versão **Linux**. O executável de Windows continua sendo o pacote pronto, sem o fonte daquele sistema. Os dois geram planilha e PDF no mesmo desenho de abas. No Linux, a licença gravada é a da distribuição (neste Mint, GPL-2.0+), não a chave do Windows.
 
 ---
 
@@ -144,18 +146,29 @@ O passo a passo completo, com imagens, está em:
 - Permissão de administrador (`sudo`)  
 - Ver o manual de utilização para o passo a passo  
 
-**Gerar o binário Linux** (só funciona **dentro** de um Linux — WSL2, VM ou PC Linux):
+**Executar no Linux** (na raiz do projeto):
 
-1. Abra o terminal na raiz do projeto.  
-2. Siga o checklist completo em [`docs/DEPENDENCIAS_SO.md`](docs/DEPENDENCIAS_SO.md) (seção **Linux — o que falta / como gerar o binário**).  
-3. Comando principal após instalar dependências:
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+sudo -E .venv/bin/python -m hw_inventory
+```
+
+O programa, quando roda como root, procura sozinho o acesso gráfico da sessão de quem chamou o `sudo`.
+
+**Gerar o binário Linux** (só dentro de um Linux):
+
+1. Siga o checklist em [`docs/DEPENDENCIAS_SO.md`](docs/DEPENDENCIAS_SO.md).
+2. Depois:
 
 ```bash
 chmod +x scripts/build_linux.sh
 ./scripts/build_linux.sh
 ```
 
-Saída: `dist/hw-inventory` (não é `.exe`). Uso: `sudo ./hw-inventory`.
+Saída: `dist/hw-inventory` (não é `.exe` e não substitui o `.exe` do Windows). Uso: `sudo -E ./dist/hw-inventory`.
+
+O binário `dist/hw-inventory` já foi gerado. A janela empacotada ainda não foi testada.
 
 ---
 
@@ -187,7 +200,7 @@ NOME-DO-PC_relatorio_hardware.pdf
 
 - Prefira sempre informar o **número de patrimônio** quando o bem já estiver tombado.  
 - Guarde cópia dos relatórios na pasta institucional do laboratório.  
-- Se o relatório trouxer **chave completa** de licença Windows (quando aplicável), trate o arquivo como documento sensível.  
+- No Linux, o campo **Chave do Linux** traz a licença da distribuição. Se alguém digitar outra chave, ou se houver token de assinatura, trate o arquivo como documento sensível.  
 - Não compartilhe relatórios sensíveis por e-mail aberto.
 
 ---
@@ -196,7 +209,9 @@ NOME-DO-PC_relatorio_hardware.pdf
 
 | Situação | O que fazer |
 |----------|-------------|
-| Pediu administrador | Botão direito → **Executar como administrador** |
+| Pediu administrador | No Windows: botão direito → **Executar como administrador**. No Linux: `sudo -E` |
+| `sudo: hw_inventory: comando não encontrado` | Use `sudo -E .venv/bin/python -m hw_inventory` na pasta do projeto |
+| Janela não abre no Linux (`couldn't connect to display`) | Rode de novo com `sudo -E` a partir do usuário gráfico, não de um terminal sem sessão |
 | Windows bloqueia o arquivo | Propriedades → **Desbloquear** |
 | Não encontra os arquivos | Área de Trabalho do usuário logado → `Inventario_Patrimonial` |
 | PDF “não atualizou” | Feche o PDF aberto e gere novamente |
