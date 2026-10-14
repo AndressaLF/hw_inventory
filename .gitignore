@@ -9,12 +9,29 @@
 # Mantem apenas estes arquivos na raiz
 !.gitignore
 !README.md
+!LICENSE
+!requirements.txt
+
+# Ambiente virtual e cache de build ficam de fora
+.venv/
+build/
+
+# Versão Linux (código, testes e build)
+!hw_inventory/
+!hw_inventory/**
+!tests/
+!tests/**
+!scripts/
+!scripts/**
+!docs/
+!docs/**
 
 # Mantem a pasta dist, mas so com o que o usuario final precisa
 !dist/
 dist/*
 
 !dist/hw-inventory.exe
+!dist/hw-inventory
 !dist/MANUAL_UTILIZACAO.md
 !dist/MANUAL_UTILIZACAO.pdf
 !dist/manual_imagens/
